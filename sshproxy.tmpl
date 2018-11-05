@@ -1,0 +1,47 @@
+{{ $CurrentContainer := where $ "ID" .Docker.CurrentContainerID | first }}
+
+{{ define "config" }}
+	{{ if .Address }}
+		{{/* If we got the containers from swarm and this container's port is published to host, use host IP:PORT */}}
+		{{ if and .Container.Node.ID .Address.HostPort }}
+{{ .Name }}|{{ if .Container.Env.SSH_REDIRECT_USER }}{{ .Container.Env.SSH_REDIRECT_USER }}@{{end}}{{ .Container.Node.Address.IP }}{{ if .Container.Env.SSH_REDIRECT_PORT }}:{{ .Container.Env.SSH_REDIRECT_PORT }}{{end}}
+		{{/* If there is no swarm node or the port is not published on host, use container's IP:PORT */}}
+		{{ else if .Network }}
+{{ .Name }}|{{ if .Container.Env.SSH_REDIRECT_USER }}{{ .Container.Env.SSH_REDIRECT_USER }}@{{end}}{{ .Network.IP }}{{ if .Container.Env.SSH_REDIRECT_PORT }}:{{ .Container.Env.SSH_REDIRECT_PORT }}{{end}}
+		{{ end }}
+	{{ else if .Network }}
+		{{ if .Network.IP }}
+{{ .Name }}|{{ if .Container.Env.SSH_REDIRECT_USER }}{{ .Container.Env.SSH_REDIRECT_USER }}@{{end}}{{ .Network.IP }}{{ if .Container.Env.SSH_REDIRECT_PORT }}:{{ .Container.Env.SSH_REDIRECT_PORT }}{{end}}
+		{{ end }}
+	{{ end }}
+
+{{ end }}
+
+{{ range $host, $containers := groupByMulti $ "Env.SSH_PROXY_USER" "," }}
+
+{{ $host := trim $host }}
+{{ $is_regexp := hasPrefix "~" $host }}
+{{ $upstream_name := when $is_regexp (sha1 $host) $host }}
+
+{{ range $container := $containers }}
+	{{ $addrLen := len $container.Addresses }}
+
+	{{ range $knownNetwork := $CurrentContainer.Networks }}
+		{{ range $containerNetwork := $container.Networks }}
+			{{ if (and (ne $containerNetwork.Name "ingress") (or (eq $knownNetwork.Name $containerNetwork.Name) (eq $knownNetwork.Name "host"))) }}
+				{{/* If only 1 port exposed, use that */}}
+				{{ if eq $addrLen 1 }}
+					{{ $address := index $container.Addresses 0 }}
+					{{ template "config" (dict "Container" $container "Address" $address "Network" $containerNetwork "Name" $host) }}
+				{{/* If more than one port exposed, use the one matching SSH_PORT env var, falling back to standard ssh port 22 */}}
+				{{ else }}
+					{{ $port := coalesce $container.Env.VIRTUAL_PORT "22" }}
+					{{ $address := where $container.Addresses "Port" $port | first }}
+					{{ template "config" (dict "Container" $container "Address" $address "Network" $containerNetwork "Name" $host) }}
+				{{ end }}
+			{{ end }}
+		{{ end }}
+	{{ end }}
+{{ end }}
+
+{{ end }}

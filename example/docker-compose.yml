@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  sftp:
+    command: foo:pass:1001
+    environment:
+      - SSH_PROXY_USER=proxy
+      - SSH_REDIRECT_USER=foo
+    image: atmoz/sftp
+    networks:
+      - default
+      - sshproxy
+    volumes:
+      - ./:/home/foo/upload
+
+networks:
+  sshproxy:
+    external:
+      name: example_sshproxy
+
+
