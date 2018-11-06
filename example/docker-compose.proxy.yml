@@ -2,9 +2,7 @@ version: '2'
 
 services:
   ssh-proxy:
-    build:
-      context: ../
-      dockerfile: bundled/Dockerfile
+    build: ../bundled
     ports:
       - 2222:2222
     networks:

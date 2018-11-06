@@ -27,11 +27,11 @@ RUN wget https://github.com/jwilder/docker-gen/releases/download/$DOCKER_GEN_VER
 ## SCRIPTS
 ## -------
 
-COPY ./bundled/docker-entrypoint.sh /
-COPY ./bundled/Procfile /
-COPY ./bundled/reload-on-change.sh /reload-on-change.sh
-COPY ./dockergen/sshproxy.tmpl /etc/docker-gen/templates/sshproxy.tmpl
-COPY ./scripts/generateConfig.sh /
+COPY ./docker-entrypoint.sh /
+COPY ./Procfile /
+COPY ./reload-on-change.sh /reload-on-change.sh
+COPY ./sshproxy.tmpl /etc/docker-gen/templates/sshproxy.tmpl
+COPY ./generateConfig.sh /
 
 RUN mkdir -p /docker-entrypoint.d \
  && mkdir -p /etc/sshpiper/docker \
