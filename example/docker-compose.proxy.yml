@@ -1,24 +1,17 @@
 version: '2'
 
 services:
-  dockergen:
-    command: -watch /etc/docker-gen/templates/sshproxy.tmpl /etc/sshpiper/docker.generated.conf
-    build: ../dockergen
-    networks:
-      - sshproxy
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ../dockergen/sshproxy.tmpl:/etc/docker-gen/templates/sshproxy.tmpl
-    volumes_from:
-      - ssh-proxy
-    restart: always
   ssh-proxy:
-    build: ../
+    build:
+      context: ../
+      dockerfile: bundled/Dockerfile
     ports:
       - 2222:2222
     networks:
       - sshproxy
-    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: unless-stopped
 
 networks:
   sshproxy:
