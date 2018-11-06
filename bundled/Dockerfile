@@ -34,7 +34,6 @@ COPY ./sshproxy.tmpl /etc/docker-gen/templates/sshproxy.tmpl
 COPY ./generateConfig.sh /
 
 RUN mkdir -p /docker-entrypoint.d \
- && mkdir -p /etc/sshpiper/docker \
  && touch /etc/sshpiper/docker.generated.conf \
  && chmod +x /docker-entrypoint.sh \
  && chmod +x /generateConfig.sh \
