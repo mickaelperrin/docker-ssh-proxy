@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  ssh-proxy:
+    build:
+      context: ../
+      dockerfile: bundled/Dockerfile
+    ports:
+      - 2222:2222
+    networks:
+      - sshproxy
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: unless-stopped
+
+networks:
+  sshproxy:
+
+

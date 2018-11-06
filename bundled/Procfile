@@ -1,0 +1,3 @@
+dockergen:  docker-gen -watch /etc/docker-gen/templates/sshproxy.tmpl /etc/sshpiper/docker.generated.conf
+watcher: /reload-on-change.sh
+sshpiperd: /go/bin/sshpiperd
