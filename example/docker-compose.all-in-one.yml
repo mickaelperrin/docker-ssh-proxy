@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  ssh-proxy:
+    build: ../bundled
+    ports:
+      - 2222:2222
+    networks:
+      - sshproxy
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: unless-stopped
+
+  sftp:
+    command: foo:pass:1001
+    depends_on:
+      - ssh-proxy
+    environment:
+      - SSH_PROXY_USER=proxy
+      - SSH_REDIRECT_USER=foo
+    image: atmoz/sftp
+    networks:
+      - sshproxy
+    volumes:
+      - ./:/home/foo/upload
+
+networks:
+  sshproxy:
+
+
