@@ -22,7 +22,7 @@ services:
     networks:
       - sshproxy
     volumes:
-      - ./:/home/foo/upload
+      - ./sftpdir:/home/foo
 
 networks:
   sshproxy:
