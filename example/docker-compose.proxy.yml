@@ -3,12 +3,12 @@ version: '2'
 services:
   dockergen:
     command: -watch /etc/docker-gen/templates/sshproxy.tmpl /etc/sshpiper/docker.generated.conf
-    image: jwilder/docker-gen
+    build: ../dockergen
     networks:
       - sshproxy
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ../sshproxy.tmpl:/etc/docker-gen/templates/sshproxy.tmpl
+      - ../dockergen/sshproxy.tmpl:/etc/docker-gen/templates/sshproxy.tmpl
     volumes_from:
       - ssh-proxy
     restart: always
