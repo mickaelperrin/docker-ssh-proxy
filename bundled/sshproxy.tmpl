@@ -35,7 +35,7 @@
 					{{ template "config" (dict "Container" $container "Address" $address "Network" $containerNetwork "Name" $host) }}
 				{{/* If more than one port exposed, use the one matching SSH_PORT env var, falling back to standard ssh port 22 */}}
 				{{ else }}
-					{{ $port := coalesce $container.Env.VIRTUAL_PORT "22" }}
+					{{ $port := coalesce $container.Env.SSH_PORT "22" }}
 					{{ $address := where $container.Addresses "Port" $port | first }}
 					{{ template "config" (dict "Container" $container "Address" $address "Network" $containerNetwork "Name" $host) }}
 				{{ end }}
